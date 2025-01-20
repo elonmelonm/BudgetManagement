@@ -73,45 +73,45 @@ module.exports = {
         username,
         email,
         password: hashedPassword,
-        verificationStatus: false, // Par défaut, l'utilisateur n'est pas vérifié
+        verificationStatus: true, // Par défaut, l'utilisateur n'est pas vérifié
       });
 
-      // Génération d'un token d'activation
-      const activationToken = jwt.sign(
-        { id: newUser.id, email: newUser.email },
-        SECRET_KEY,
-        { expiresIn: '24h' } // Le lien d'activation est valide pendant 24 heures
-      );
+      // // Génération d'un token d'activation
+      // const activationToken = jwt.sign(
+      //   { id: newUser.id, email: newUser.email },
+      //   SECRET_KEY,
+      //   { expiresIn: '24h' } // Le lien d'activation est valide pendant 24 heures
+      // );
 
-      // Création du lien d'activation
-      const activationLink = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/activate-account/${activationToken}`;
+      // // Création du lien d'activation
+      // const activationLink = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/activate-account/${activationToken}`;
 
-      // Envoi d'un email de confirmation
-      const mailOptions = {
-        from: process.env.EMAIL_USER,
-        to: email,
-        subject: 'Activation de votre compte',
-        html: `
-          <body>
-            <p>Bonjour ${username},</p>
-            <p>Merci de vous être inscrit. Votre compte a été créé avec succès !</p>
-            <p>Veuillez activer votre compte en cliquant sur le lien suivant :</p>
-            <a href="${activationLink}">${activationLink}</a>
-            <p>Ce lien est valide pendant 24 heures.</p>
-            <p>Cordialement,</p>
-            <p>L'équipe.</p>
-          </body>
-        `,
-      };
+      // // Envoi d'un email de confirmation
+      // const mailOptions = {
+      //   from: process.env.EMAIL_USER,
+      //   to: email,
+      //   subject: 'Activation de votre compte',
+      //   html: `
+      //     <body>
+      //       <p>Bonjour ${username},</p>
+      //       <p>Merci de vous être inscrit. Votre compte a été créé avec succès !</p>
+      //       <p>Veuillez activer votre compte en cliquant sur le lien suivant :</p>
+      //       <a href="${activationLink}">${activationLink}</a>
+      //       <p>Ce lien est valide pendant 24 heures.</p>
+      //       <p>Cordialement,</p>
+      //       <p>L'équipe.</p>
+      //     </body>
+      //   `,
+      // };
 
-      try {
-        await transporter.sendMail(mailOptions);
-        console.log('Envoi d\'email à: ' +  email + ' réussi.')
+      // try {
+      //   await transporter.sendMail(mailOptions);
+      //   console.log('Envoi d\'email à: ' +  email + ' réussi.')
 
-      } catch (error) {
-        console.error('Erreur lors de l\'envoi de l\'email:', error);
-        return res.status(500).json({ message: 'Erreur lors de l\'envoi de l\'email de vérification.' });
-      }
+      // } catch (error) {
+      //   console.error('Erreur lors de l\'envoi de l\'email:', error);
+      //   return res.status(500).json({ message: 'Erreur lors de l\'envoi de l\'email de vérification.' });
+      // }
       
 
       res.status(201).json({

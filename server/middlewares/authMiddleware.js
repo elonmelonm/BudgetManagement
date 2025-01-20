@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const { Admin } = require('../models'); // Modèle Sequelize pour la table Admins
+// const { Admin } = require('../models'); // Modèle Sequelize pour la table Admins
 
 // Middleware pour vérifier si l'utilisateur est authentifié
 const isAuthenticated = (req, res, next) => {
