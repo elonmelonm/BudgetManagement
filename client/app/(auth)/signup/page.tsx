@@ -15,7 +15,7 @@ export default function RegisterPage() {
         </div>
 
         <div className="mt-8">
-          <AuthForm mode="register" />
+          <AuthForm mode="signup" />
         </div>
 
         <div className="text-center text-sm">

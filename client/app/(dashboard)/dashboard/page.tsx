@@ -1,13 +1,53 @@
+'use client';
+
 import { Card } from '@/components/ui/card';
-import {
-  ArrowUpCircle,
-  ArrowDownCircle,
-  Wallet,
-  Target
-} from 'lucide-react';
+import { ArrowUpCircle, ArrowDownCircle, Wallet, Target } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function DashboardPage() {
+  const router = useRouter();
+  const [isAuthorized, setIsAuthorized] = useState(false); // État pour vérifier si l'utilisateur est autorisé
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        // Divisez le token JWT en trois parties
+        const [header, payload, signature] = token.split('.');
+
+        // Décodez la partie payload (Base64URL -> Base64 -> JSON)
+        const decodedPayload = JSON.parse(
+          atob(payload.replace(/_/g, '/').replace(/-/g, '+'))
+        );
+
+        // Vérifier l'expiration du token
+        const currentTime = Date.now() / 1000;
+        if (decodedPayload.exp < currentTime) {
+          // Si le token est expiré, supprimer le token et rediriger
+          localStorage.removeItem('token');
+          router.push('/login');
+        } else {
+          // Token valide, autoriser l'accès
+          setIsAuthorized(true);
+        }
+      } catch (error) {
+        console.error('Invalid token:', error);
+        localStorage.removeItem('token'); // Supprimer le token invalide
+        router.push('/login');
+      }
+    } else {
+      // Pas de token, rediriger vers la page de connexion
+      router.push('/login');
+    }
+  }, [router]);
+
+  // Afficher un écran de chargement pendant la vérification du token
+  if (!isAuthorized) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div className="space-y-8">
       {/* Cartes de résumé */}
@@ -70,7 +110,7 @@ export default function DashboardPage() {
               {
                 id: 1,
                 description: 'Courses Carrefour',
-                montant: -85.50,
+                montant: -85.5,
                 date: '2024-03-20',
                 categorie: 'Alimentation'
               },

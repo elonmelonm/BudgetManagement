@@ -15,23 +15,23 @@ const statisticsRoutes = require('./routes/statistics');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// // Liste des origines autorisées
-// const allowedOrigins = ['https://fairstories.vercel.app', 'http://localhost:3000'];
+// Liste des origines autorisées
+const allowedOrigins = ['http://localhost:3000'];
 
 
-// // Configuration CORS avec une fonction pour gérer plusieurs origines
-// app.use(
-// cors({
-//     origin: (origin, callback) => {
-//     // Autorise l'origine si elle est dans la liste ou si elle est absente (par exemple, pour des outils comme Postman)
-//     if (!origin || allowedOrigins.includes(origin)) {
-//         callback(null, true);
-//     } else {
-//         callback(new Error('Not allowed by CORS'));
-//     }
-//     },
-// })
-// );
+// Configuration CORS avec une fonction pour gérer plusieurs origines
+app.use(
+cors({
+    origin: (origin, callback) => {
+    // Autorise l'origine si elle est dans la liste ou si elle est absente (par exemple, pour des outils comme Postman)
+    if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+    } else {
+        callback(new Error('Not allowed by CORS'));
+    }
+    },
+})
+);
 
 // Middleware pour parser le JSON
 app.use(express.json());

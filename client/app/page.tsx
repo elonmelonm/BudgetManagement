@@ -1,8 +1,38 @@
+'use client'; 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Wallet, PieChart, Target, ArrowRight } from 'lucide-react';
+import { useEffect } from 'react';
 
 export default function Home() {
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        // Divisez le token JWT en trois parties
+        const [header, payload, signature] = token.split('.');
+
+        // Décodez la partie payload (Base64URL -> Base64 -> JSON)
+        const decodedPayload = JSON.parse(atob(payload.replace(/_/g, '/').replace(/-/g, '+')));
+
+        // Vérifier l'expiration du token
+        const currentTime = Date.now() / 1000;
+        if (decodedPayload.exp < currentTime) {
+          // Si le token est expiré, supprimer le token et rediriger vers login
+          localStorage.removeItem('token');
+          window.location.href = '/login';
+        } else {
+          // Si le token est valide, rediriger vers le dashboard
+          window.location.href = '/dashboard';
+        }
+      } catch (error) {
+        console.error('Invalid token:', error);
+        localStorage.removeItem('token');
+        window.location.href = '/login';
+      }
+    }
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted">
       <div className="container mx-auto px-4 py-16">
@@ -15,7 +45,7 @@ export default function Home() {
             <Link href="/login">
               <Button variant="ghost">Sign In</Button>
             </Link>
-            <Link href="/register">
+            <Link href="/signup">
               <Button>Get Started</Button>
             </Link>
           </div>
