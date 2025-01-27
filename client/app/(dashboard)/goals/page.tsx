@@ -4,8 +4,16 @@ import { useState, useEffect } from 'react';
 import { fetchGoals, fetchBudgets, fetchCategories } from '@/services/api';
 import { GoalList } from '@/components/goals/goal-list';
 
+// Définir le type pour un objectif (goal)
+type Goal = {
+  id: string;
+  name: string;
+  targetAmount: number;
+  // Ajoutez d'autres propriétés si nécessaire
+};
+
 export default function GoalsPage() {
-  const [goals, setGoals] = useState([]);
+  const [goals, setGoals] = useState<Goal[]>([]); // Typage de l'état goals
   const [initialBudget, setInitialBudget] = useState<number>(0);
   const [budgetId, setBudgetId] = useState<string>('');
   const [categories, setCategories] = useState([]);
@@ -33,7 +41,7 @@ export default function GoalsPage() {
     loadData();
   }, []);
 
-  const handleGoalCreated = (newGoal: any) => {
+  const handleGoalCreated = (newGoal: Goal) => {
     setGoals((prevGoals) => [...prevGoals, newGoal]);
   };
 
@@ -41,7 +49,7 @@ export default function GoalsPage() {
     setGoals((prevGoals) => prevGoals.filter((goal) => goal.id !== goalId));
   };
 
-  const handleEditGoal = (updatedGoal: any) => {
+  const handleEditGoal = (updatedGoal: Goal) => {
     setGoals((prevGoals) =>
       prevGoals.map((goal) => (goal.id === updatedGoal.id ? updatedGoal : goal))
     );
