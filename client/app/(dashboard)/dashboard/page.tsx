@@ -10,6 +10,15 @@ import { BudgetDialog } from '@/components/budgets/budget-dialog';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 
+// Définir le type pour une transaction
+type Transaction = {
+  id: string;
+  name: string;
+  amount: number;
+  type: 'income' | 'expense';
+  date: string;
+};
+
 export default function DashboardPage() {
   const router = useRouter();
   const { toast } = useToast();
@@ -17,7 +26,7 @@ export default function DashboardPage() {
   const [initialBudget, setInitialBudget] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [transactions, setTransactions] = useState([]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]); // Typage de l'état transactions
   const [statistics, setStatistics] = useState({ totalIncome: 0, totalExpense: 0 });
 
   useEffect(() => {
