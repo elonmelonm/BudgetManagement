@@ -8,11 +8,17 @@ import { fetchCategories, createCategory, updateCategory, deleteCategory } from 
 import { EditCategoryDialog } from '@/components/categories/editCategoryDialog';
 import { CategoryDialog } from '@/components/categories/category-dialog';
 
+// Définir le type pour une catégorie
+type Category = {
+  id: string;
+  name: string;
+};
+
 export default function CategoriesPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<{ id: string; name: string } | null>(null);
-  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+  const [categories, setCategories] = useState<Category[]>([]);
 
   // Récupérer les catégories lors du chargement de la page
   useEffect(() => {
@@ -29,12 +35,12 @@ export default function CategoriesPage() {
   }, []);
 
   // Ajouter une nouvelle catégorie
-  const handleCategoryCreated = (newCategory) => {
+  const handleCategoryCreated = (newCategory: Category) => {
     setCategories((prevCategories) => [...prevCategories, newCategory]);
   };
 
   // Modifier une catégorie
-  const handleCategoryUpdated = (updatedCategory) => {
+  const handleCategoryUpdated = (updatedCategory: Category) => {
     setCategories((prevCategories) =>
       prevCategories.map((cat) =>
         cat.id === updatedCategory.id ? updatedCategory : cat
@@ -53,7 +59,7 @@ export default function CategoriesPage() {
   };
 
   // Ouvrir le dialogue de modification
-  const handleEditCategory = (category: { id: string; name: string }) => {
+  const handleEditCategory = (category: Category) => {
     setSelectedCategory(category);
     setEditDialogOpen(true);
   };
