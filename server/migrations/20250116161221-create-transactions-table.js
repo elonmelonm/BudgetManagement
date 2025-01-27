@@ -22,7 +22,7 @@ module.exports = {
         allowNull: false,
       },
       type: {
-        type: DataTypes.ENUM('income', 'expense'),
+        type: Sequelize.ENUM('income', 'expense'), // Remplacez `DataTypes` par `Sequelize`
         allowNull: false,
       },
       categoryId: {
@@ -46,10 +46,10 @@ module.exports = {
       userId: {
         type: Sequelize.UUID,
         references: {
-          model: 'Users', // Vérifiez que votre modèle User est bien défini
+          model: 'Users',
           key: 'id',
         },
-        allowNull: false, // ou true en fonction de votre logique
+        allowNull: false,
       },
       createdAt: {
         allowNull: false,

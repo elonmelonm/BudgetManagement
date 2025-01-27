@@ -19,50 +19,34 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { createCategory } from '@/services/api'; // Import de la fonction API
+import { updateCategory } from '@/services/api';
 
 const categorySchema = z.object({
   name: z.string().min(1, 'Le nom est requis'),
 });
 
-interface CategoryDialogProps {
+interface EditCategoryDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onCategoryCreated?: (newCategory: any) => void; // Fonction de rappel avec la nouvelle catégorie
+  category: { id: string; name: string };
+  onCategoryUpdated: (updatedCategory: any) => void;
 }
 
-export function CategoryDialog({ open, onOpenChange, onCategoryCreated }: CategoryDialogProps) {
+export function EditCategoryDialog({ open, onOpenChange, category, onCategoryUpdated }: EditCategoryDialogProps) {
   const form = useForm<z.infer<typeof categorySchema>>({
     resolver: zodResolver(categorySchema),
     defaultValues: {
-      name: '',
+      name: category.name,
     },
   });
 
-  async function onSubmit(data: z.infer<typeof transactionSchema>) {
+  async function onSubmit(data: z.infer<typeof categorySchema>) {
     try {
-      // Convertir le montant en nombre
-      const amount = parseFloat(data.montant);
-  
-      // Formater la date au format ISO 8601
-      const formattedDate = data.date.toISOString();
-  
-      // Appel API pour créer une nouvelle transaction
-      const newTransaction = await createTransaction({
-        name: data.description, // Utilisez 'description' comme 'name'
-        amount: amount,
-        date: formattedDate, // Date au format ISO 8601
-        type: data.type,
-        categoryId: data.categoryId, // Utilisez 'categoryId'
-      });
-  
-      console.log('Transaction créée avec succès:', newTransaction);
-  
-      // Fermer le dialogue et réinitialiser le formulaire
-      onOpenChange(false);
-      form.reset();
+      const updatedCategory = await updateCategory(category.id, data);
+      onCategoryUpdated(updatedCategory); // Mettre à jour la liste des catégories
+      onOpenChange(false); // Fermer le dialogue
     } catch (error) {
-      console.error('Erreur lors de la création de la transaction:', error);
+      console.error('Erreur lors de la mise à jour de la catégorie:', error);
     }
   }
 
@@ -70,7 +54,7 @@ export function CategoryDialog({ open, onOpenChange, onCategoryCreated }: Catego
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Nouvelle catégorie</DialogTitle>
+          <DialogTitle>Modifier la catégorie</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">

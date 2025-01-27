@@ -1,40 +1,62 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Plus, Pencil, Trash2 } from 'lucide-react';
+import { fetchCategories, createCategory, updateCategory, deleteCategory } from '@/services/api';
+import { EditCategoryDialog } from '@/components/categories/editCategoryDialog';
 import { CategoryDialog } from '@/components/categories/category-dialog';
-
-const categories = [
-  {
-    id: 1,
-    nom: 'Alimentation',
-    type: 'expense',
-    couleur: '#EF4444',
-  },
-  {
-    id: 2,
-    nom: 'Transport',
-    type: 'expense',
-    couleur: '#3B82F6',
-  },
-  {
-    id: 3,
-    nom: 'Loisirs',
-    type: 'expense',
-    couleur: '#10B981',
-  },
-  {
-    id: 4,
-    nom: 'Salaire',
-    type: 'income',
-    couleur: '#6366F1',
-  },
-];
 
 export default function CategoriesPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<{ id: string; name: string } | null>(null);
+  const [categories, setCategories] = useState([]);
+
+  // Récupérer les catégories lors du chargement de la page
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const data = await fetchCategories();
+        setCategories(data);
+      } catch (error) {
+        console.error('Erreur lors de la récupération des catégories:', error);
+      }
+    };
+
+    loadCategories();
+  }, []);
+
+  // Ajouter une nouvelle catégorie
+  const handleCategoryCreated = (newCategory) => {
+    setCategories((prevCategories) => [...prevCategories, newCategory]);
+  };
+
+  // Modifier une catégorie
+  const handleCategoryUpdated = (updatedCategory) => {
+    setCategories((prevCategories) =>
+      prevCategories.map((cat) =>
+        cat.id === updatedCategory.id ? updatedCategory : cat
+      )
+    );
+  };
+
+  // Supprimer une catégorie
+  const handleDeleteCategory = async (id: string) => {
+    try {
+      await deleteCategory(id);
+      setCategories((prevCategories) => prevCategories.filter((cat) => cat.id !== id));
+    } catch (error) {
+      console.error('Erreur lors de la suppression de la catégorie:', error);
+    }
+  };
+
+  // Ouvrir le dialogue de modification
+  const handleEditCategory = (category: { id: string; name: string }) => {
+    setSelectedCategory(category);
+    setEditDialogOpen(true);
+  };
 
   return (
     <div className="space-y-6">
@@ -51,22 +73,22 @@ export default function CategoriesPage() {
           <Card key={category.id} className="p-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div
-                  className="w-4 h-4 rounded-full"
-                  style={{ backgroundColor: category.couleur }}
-                />
-                <div>
-                  <h3 className="font-medium">{category.nom}</h3>
-                  <p className="text-sm text-muted-foreground">
-                    {category.type === 'income' ? 'Revenu' : 'Dépense'}
-                  </p>
-                </div>
+                <h3 className="font-medium">{category.name}</h3>
               </div>
               <div className="flex gap-2">
-                <Button variant="ghost" size="icon">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => handleEditCategory(category)}
+                >
                   <Pencil className="h-4 w-4" />
                 </Button>
-                <Button variant="ghost" size="icon" className="text-destructive">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-destructive"
+                  onClick={() => handleDeleteCategory(category.id)}
+                >
                   <Trash2 className="h-4 w-4" />
                 </Button>
               </div>
@@ -75,7 +97,20 @@ export default function CategoriesPage() {
         ))}
       </div>
 
-      <CategoryDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} />
+      <CategoryDialog
+        open={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        onCategoryCreated={handleCategoryCreated}
+      />
+
+      {selectedCategory && (
+        <EditCategoryDialog
+          open={editDialogOpen}
+          onOpenChange={setEditDialogOpen}
+          category={selectedCategory}
+          onCategoryUpdated={handleCategoryUpdated}
+        />
+      )}
     </div>
   );
 }

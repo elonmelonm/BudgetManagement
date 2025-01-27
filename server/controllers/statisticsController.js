@@ -1,11 +1,14 @@
+const { where } = require('sequelize');
 const { Budget, Goal, Category, Transaction, Recurrence } = require('../models');
 
 module.exports = {
   // Récupérer le résumé du budget
   getBudgetSummary: async (req, res) => {
     try {
-      // Récupère le seul budget existant
-      const budget = await Budget.findOne();
+        const userId = req.user.id;
+        // Récupère le seul budget existant
+      const budget = await Budget.findOne({where: { userId: userId }});
+      console.log(budget)
 
       if (!budget) {
         return res.status(404).json({ message: 'Aucun budget trouvé.' });
@@ -13,11 +16,14 @@ module.exports = {
 
       // Calculer le total des dépenses et des revenus pour ce budget
       const expenses = await Transaction.findAll({
-        where: { budgetId: budget.id, type: 'expense' },
+        where: { budgetId: budget.id, type: 'expense', userId: userId },
       });
       const incomes = await Transaction.findAll({
-        where: { budgetId: budget.id, type: 'income' },
+        where: { budgetId: budget.id, type: 'income', userId: userId },
       });
+
+      console.log(expenses)
+      console.log(incomes)
 
       const totalExpense = expenses.reduce((acc, exp) => acc + exp.amount, 0);
       const totalIncome = incomes.reduce((acc, inc) => acc + inc.amount, 0);

@@ -29,7 +29,7 @@ module.exports = {
         type: Sequelize.INTEGER,
         defaultValue: 1,
         allowNull: false,
-        unique: true, // Contrôle que cette valeur est unique
+        // unique: true, // Contrôle que cette valeur est unique
       },
       userId: {
         type: Sequelize.UUID,
@@ -38,6 +38,8 @@ module.exports = {
           key: 'id',
         },
         allowNull: false, // ou true en fonction de votre logique
+        unique: true,
+        onDelete: 'CASCADE',
       },
     });
   },

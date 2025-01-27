@@ -36,6 +36,10 @@ module.exports = (sequelize) => {
         type: DataTypes.FLOAT,
         allowNull: false,
       },
+      type: {
+        type: DataTypes.ENUM('income', 'expense'),
+        allowNull: false,
+      },
       categoryId: {
         type: DataTypes.UUID,
         allowNull: false,

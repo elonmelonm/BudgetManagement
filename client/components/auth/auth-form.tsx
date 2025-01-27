@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-
+import { useRouter } from 'next/navigation';
 
 const authSchema = z.object({
   username: z.string().nonempty('Username is required').optional(),
@@ -33,6 +33,7 @@ interface AuthFormProps {
 export function AuthForm({ mode }: AuthFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const router = useRouter();
 
   const form = useForm<AuthFormData>({
     resolver: zodResolver(authSchema),
@@ -47,30 +48,23 @@ export function AuthForm({ mode }: AuthFormProps) {
     const token = localStorage.getItem('token');
     if (token) {
       try {
-        // Divisez le token JWT en trois parties
         const [header, payload, signature] = token.split('.');
-
-        // Décodez la partie payload (Base64URL -> Base64 -> JSON)
         const decodedPayload = JSON.parse(atob(payload.replace(/_/g, '/').replace(/-/g, '+')));
-
-        // Vérifier l'expiration du token
         const currentTime = Date.now() / 1000;
-        console.log(currentTime)
+
         if (decodedPayload.exp < currentTime) {
-          // Si le token est expiré, supprimer le token et rediriger vers login
           localStorage.removeItem('token');
-          window.location.href = '/login';
+          router.push('/login');
         } else {
-          // Si le token est valide, rediriger vers le dashboard
-          window.location.href = '/dashboard';
+          router.push('/dashboard');
         }
       } catch (error) {
         console.error('Invalid token:', error);
         localStorage.removeItem('token');
-        window.location.href = '/login';
+        router.push('/login');
       }
     }
-  }, []);
+  }, [router]);
 
   const handleSubmit = async (data: AuthFormData) => {
     const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
@@ -88,21 +82,17 @@ export function AuthForm({ mode }: AuthFormProps) {
         throw new Error(errorData.message || 'Authentication failed');
       }
 
-      // Si la connexion ou l'inscription est réussie, traiter la réponse du backend
       const responseData = await response.json();
-
-      // Stocker le token dans localStorage
       localStorage.setItem('token', responseData.token);
 
-      // Redirection après le succès de la connexion/inscription
       if (mode === 'login') {
-        window.location.href = '/dashboard';
+        router.push('/dashboard');
       } else {
         toast({
           title: 'Account created successfully!',
           description: 'Please log in with your new account.',
         });
-        window.location.href = '/login';
+        router.push('/login');
       }
 
       form.reset();

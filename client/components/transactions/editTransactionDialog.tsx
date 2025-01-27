@@ -33,35 +33,30 @@ import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { CalendarIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { fetchCategories, createTransaction } from '@/services/api';
+import { fetchCategories, updateTransaction } from '@/services/api';
 
 const transactionSchema = z.object({
-  description: z.string().min(1, 'La description est requise'),
-  montant: z.string().min(1, 'Le montant est requis'),
+  name: z.string().min(1, 'La description est requise'),
+  amount: z.string().min(1, 'Le montant est requis'),
   type: z.enum(['income', 'expense']),
   categoryId: z.string().min(1, 'La catégorie est requise'),
   date: z.date(),
 });
 
-interface TransactionDialogProps {
+interface EditTransactionDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onTransactionCreated: (transaction: any) => void;
+  transaction: any;
+  onTransactionUpdated: (updatedTransaction: any) => void;
 }
 
-export function TransactionDialog({ open, onOpenChange, onTransactionCreated }: TransactionDialogProps) {
+export function EditTransactionDialog({ 
+  open, 
+  onOpenChange, 
+  transaction, 
+  onTransactionUpdated 
+}: EditTransactionDialogProps) {
   const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
-
-  const form = useForm<z.infer<typeof transactionSchema>>({
-    resolver: zodResolver(transactionSchema),
-    defaultValues: {
-      description: '',
-      montant: '',
-      type: 'expense',
-      categoryId: '',
-      date: new Date(),
-    },
-  });
 
   useEffect(() => {
     const loadCategories = async () => {
@@ -76,27 +71,31 @@ export function TransactionDialog({ open, onOpenChange, onTransactionCreated }: 
     loadCategories();
   }, []);
 
+  const form = useForm<z.infer<typeof transactionSchema>>({
+    resolver: zodResolver(transactionSchema),
+    defaultValues: {
+      name: transaction.name,
+      amount: transaction.amount.toString(),
+      type: transaction.type,
+      categoryId: transaction.category.id,
+      date: new Date(transaction.date),
+    },
+  });
+
   async function onSubmit(data: z.infer<typeof transactionSchema>) {
     try {
-      const amount = parseFloat(data.montant);
-      const formattedDate = data.date.toISOString();
-
-      const newTransaction = await createTransaction({
-        name: data.description,
-        amount: amount,
-        date: formattedDate,
+      const updatedTransaction = await updateTransaction(transaction.id, {
+        name: data.name,
+        amount: parseFloat(data.amount),
         type: data.type,
         categoryId: data.categoryId,
+        date: data.date.toISOString(),
       });
 
-      if (onTransactionCreated) {
-        onTransactionCreated(newTransaction);
-      }
-
+      onTransactionUpdated(updatedTransaction);
       onOpenChange(false);
-      form.reset();
     } catch (error) {
-      console.error('Erreur lors de la création de la transaction:', error);
+      console.error('Erreur lors de la mise à jour de la transaction:', error);
     }
   }
 
@@ -104,13 +103,13 @@ export function TransactionDialog({ open, onOpenChange, onTransactionCreated }: 
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Nouvelle transaction</DialogTitle>
+          <DialogTitle>Modifier la transaction</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}
-              name="description"
+              name="name"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Description</FormLabel>
@@ -123,13 +122,34 @@ export function TransactionDialog({ open, onOpenChange, onTransactionCreated }: 
             />
             <FormField
               control={form.control}
-              name="montant"
+              name="amount"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Montant</FormLabel>
                   <FormControl>
-                    <Input {...field} type="number" step="0.01" placeholder="0.00" />
+                    <Input {...field} type="number" step="0.01" />
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="type"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Type</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Sélectionner le type" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="income">Revenu</SelectItem>
+                      <SelectItem value="expense">Dépense</SelectItem>
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
@@ -164,7 +184,7 @@ export function TransactionDialog({ open, onOpenChange, onTransactionCreated }: 
                         mode="single"
                         selected={field.value}
                         onSelect={field.onChange}
-                        disabled={(date) => date > new Date() || date < new Date('1900-01-01')}
+                        disabled={(date) => date > new Date()}
                         initialFocus
                       />
                     </PopoverContent>
@@ -174,49 +194,31 @@ export function TransactionDialog({ open, onOpenChange, onTransactionCreated }: 
               )}
             />
             <FormField
-              control={form.control}
-              name="type"
-              render={({ field }) => (
+            control={form.control}
+            name="categoryId"
+            render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Type</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormLabel>Catégorie</FormLabel>
+                <Select
+                    onValueChange={field.onChange}
+                    defaultValue={transaction.category.id} // Valeur par défaut basée sur la catégorie actuelle
+                >
                     <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Sélectionner le type" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="income">Revenu</SelectItem>
-                      <SelectItem value="expense">Dépense</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="categoryId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Catégorie</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
+                    <SelectTrigger>
                         <SelectValue placeholder="Sélectionner une catégorie" />
-                      </SelectTrigger>
+                    </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {categories.map((category) => (
+                    {categories.map((category) => (
                         <SelectItem key={category.id} value={category.id}>
-                          {category.name}
+                        {category.name}
                         </SelectItem>
-                      ))}
+                    ))}
                     </SelectContent>
-                  </Select>
-                  <FormMessage />
+                </Select>
+                <FormMessage />
                 </FormItem>
-              )}
+            )}
             />
             <div className="flex justify-end gap-4 pt-4">
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>

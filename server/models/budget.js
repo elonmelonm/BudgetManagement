@@ -34,6 +34,9 @@ module.exports = (sequelize) => {
           key: 'id',
         },
         allowNull: false, // ou laissez le nullable en fonction de votre logique
+        unique: true,
+        onDelete: 'CASCADE',
+
       },
     },
     {

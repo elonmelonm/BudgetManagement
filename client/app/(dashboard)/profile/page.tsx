@@ -7,7 +7,7 @@ import { EditTransactionDialog } from '@/components/transactions/editTransaction
 import { Card } from '@/components/ui/card';
 import { Wallet } from 'lucide-react';
 
-export default function TransactionsPage() {
+export default function ProfilePage() {
   const [transactions, setTransactions] = useState([]);
   const [categories, setCategories] = useState([]);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);

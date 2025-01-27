@@ -5,8 +5,8 @@ module.exports = {
     // Créer une récurrence
     createRecurrence: async (req, res) => {
       try {
-        const { name, frequency, startDate, endDate, amount, type } = req.body;
-        const userId = req.user.id
+        const { name, frequency, startDate, endDate, amount, type, categoryId } = req.body; // Ajoutez categoryId
+        const userId = req.user.id;
         
         // Récupère le seul budget existant
         const budget = await Budget.findOne(); // Assurez-vous qu'il existe au moins un budget
@@ -25,6 +25,7 @@ module.exports = {
           budgetId: budget.id, // Utilise l'ID du seul budget
           type,
           userId,
+          categoryId, // Ajoutez categoryId ici
         });
 
         res.status(201).json(newRecurrence);
@@ -87,7 +88,7 @@ module.exports = {
     updateRecurrence: async (req, res) => {
       try {
         const { id } = req.params;
-        const { name, frequency, startDate, endDate, amount, type } = req.body;
+        const { name, frequency, startDate, endDate, amount, type, categoryId } = req.body; // Ajoutez categoryId
 
         const recurrence = await Recurrence.findByPk(id);
 
@@ -95,7 +96,7 @@ module.exports = {
           return res.status(404).json({ message: 'Récurrence non trouvée.' });
         }
 
-        await recurrence.update({ name, frequency, startDate, endDate, amount, type });
+        await recurrence.update({ name, frequency, startDate, endDate, amount, type, categoryId }); // Ajoutez categoryId ici
 
         res.status(200).json(recurrence);
       } catch (error) {

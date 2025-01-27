@@ -33,33 +33,39 @@ import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { CalendarIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { fetchCategories, createTransaction } from '@/services/api';
+import { fetchCategories, createRecurrence } from '@/services/api';
+import { useToast } from '@/hooks/use-toast';
 
-const transactionSchema = z.object({
-  description: z.string().min(1, 'La description est requise'),
-  montant: z.string().min(1, 'Le montant est requis'),
+const reccurrenceSchema = z.object({
+  name: z.string().min(1, 'Le nom est requis'),
+  frequency: z.enum(['daily', 'weekly', 'monthly', 'yearly']),
+  startDate: z.date(),
+  endDate: z.date(),
+  amount: z.string().min(1, 'Le montant est requis'),
   type: z.enum(['income', 'expense']),
   categoryId: z.string().min(1, 'La catégorie est requise'),
-  date: z.date(),
 });
 
-interface TransactionDialogProps {
+interface ReccurrenceDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onTransactionCreated: (transaction: any) => void;
+  onReccurrenceCreated: (reccurrence: any) => void; // Correction de la prop
 }
 
-export function TransactionDialog({ open, onOpenChange, onTransactionCreated }: TransactionDialogProps) {
+export function ReccurrenceDialog({ open, onOpenChange, onReccurrenceCreated }: ReccurrenceDialogProps) {
   const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
+  const { toast } = useToast();
 
-  const form = useForm<z.infer<typeof transactionSchema>>({
-    resolver: zodResolver(transactionSchema),
+  const form = useForm<z.infer<typeof reccurrenceSchema>>({
+    resolver: zodResolver(reccurrenceSchema),
     defaultValues: {
-      description: '',
-      montant: '',
+      name: '',
+      frequency: 'weekly',
+      startDate: new Date(),
+      endDate: new Date(),
+      amount: '',
       type: 'expense',
       categoryId: '',
-      date: new Date(),
     },
   });
 
@@ -76,44 +82,60 @@ export function TransactionDialog({ open, onOpenChange, onTransactionCreated }: 
     loadCategories();
   }, []);
 
-  async function onSubmit(data: z.infer<typeof transactionSchema>) {
+  async function onSubmit(data: z.infer<typeof reccurrenceSchema>) {
     try {
-      const amount = parseFloat(data.montant);
-      const formattedDate = data.date.toISOString();
+      if (!data.categoryId) {
+        throw new Error('Veuillez sélectionner une catégorie.');
+      }
 
-      const newTransaction = await createTransaction({
-        name: data.description,
+      const amount = parseFloat(data.amount);
+      if (isNaN(amount) || amount <= 0) {
+        throw new Error('Le montant doit être un nombre positif.');
+      }
+
+      const startDate = data.startDate.toISOString().split('T')[0];
+      const endDate = data.endDate.toISOString().split('T')[0];
+
+      const newRecurrence = await createRecurrence({
+        name: data.name,
+        frequency: data.frequency,
+        startDate: startDate,
+        endDate: endDate,
         amount: amount,
-        date: formattedDate,
         type: data.type,
         categoryId: data.categoryId,
       });
 
-      if (onTransactionCreated) {
-        onTransactionCreated(newTransaction);
+      if (onReccurrenceCreated) {
+        onReccurrenceCreated(newRecurrence); // Utiliser la bonne prop
       }
 
       onOpenChange(false);
       form.reset();
     } catch (error) {
-      console.error('Erreur lors de la création de la transaction:', error);
+      console.error('Erreur lors de la création de la récurrence:', error);
+      toast({
+        title: 'Erreur',
+        description: error.message || 'Une erreur est survenue lors de la création de la récurrence.',
+        variant: 'destructive',
+      });
     }
   }
-
+  
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Nouvelle transaction</DialogTitle>
+          <DialogTitle>Nouvelle récurrence</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}
-              name="description"
+              name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description</FormLabel>
+                  <FormLabel>Nom</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
@@ -123,23 +145,33 @@ export function TransactionDialog({ open, onOpenChange, onTransactionCreated }: 
             />
             <FormField
               control={form.control}
-              name="montant"
+              name="frequency"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Montant</FormLabel>
-                  <FormControl>
-                    <Input {...field} type="number" step="0.01" placeholder="0.00" />
-                  </FormControl>
+                  <FormLabel>Fréquence</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Sélectionner la fréquence" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="daily">Quotidienne</SelectItem>
+                      <SelectItem value="weekly">Hebdomadaire</SelectItem>
+                      <SelectItem value="monthly">Mensuelle</SelectItem>
+                      <SelectItem value="yearly">Annuelle</SelectItem>
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
             />
             <FormField
               control={form.control}
-              name="date"
+              name="startDate"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Date</FormLabel>
+                  <FormLabel>Date de début</FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
                       <FormControl>
@@ -153,7 +185,7 @@ export function TransactionDialog({ open, onOpenChange, onTransactionCreated }: 
                           {field.value ? (
                             format(field.value, 'PPP', { locale: fr })
                           ) : (
-                            <span>Choisir une date</span>
+                            <span>Choisir une date de début</span>
                           )}
                           <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                         </Button>
@@ -164,11 +196,63 @@ export function TransactionDialog({ open, onOpenChange, onTransactionCreated }: 
                         mode="single"
                         selected={field.value}
                         onSelect={field.onChange}
-                        disabled={(date) => date > new Date() || date < new Date('1900-01-01')}
+                        disabled={(date) => date < new Date()}
                         initialFocus
                       />
                     </PopoverContent>
                   </Popover>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="endDate"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Date de fin</FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            'w-full pl-3 text-left font-normal',
+                            !field.value && 'text-muted-foreground'
+                          )}
+                        >
+                          {field.value ? (
+                            format(field.value, 'PPP', { locale: fr })
+                          ) : (
+                            <span>Choisir une date de fin</span>
+                          )}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={field.value}
+                        onSelect={field.onChange}
+                        disabled={(date) => date < new Date()}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="amount"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Montant</FormLabel>
+                  <FormControl>
+                    <Input {...field} type="number" step="0.01" placeholder="0.00" />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
