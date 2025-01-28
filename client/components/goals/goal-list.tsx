@@ -201,6 +201,7 @@ export function GoalList({
           onOpenChange={setIsEditDialogOpen}
           goal={selectedGoal}
           onGoalUpdated={handleGoalUpdated}
+          budgetId={budgetId} // Pass the budgetId prop here
         />
       )}
     </div>
