@@ -48,7 +48,7 @@ export function EditGoalDialog({
   onOpenChange, 
   goal,
   onGoalUpdated,
-  budgetId, // Récupération du budgetId automatiquement
+  budgetId,
 }: EditGoalDialogProps) {
   const { toast } = useToast();
 
@@ -67,7 +67,7 @@ export function EditGoalDialog({
         name: data.name,
         targetAmount: parseFloat(data.targetAmount),
         deadline: data.deadline.toISOString().split('T')[0],
-        budgetId: budgetId, // Utilisation du budgetId récupéré automatiquement
+        budgetId: budgetId,
       });
 
       onGoalUpdated(updatedGoal);
@@ -77,7 +77,7 @@ export function EditGoalDialog({
       console.error('Erreur lors de la mise à jour de l\'objectif:', error);
       toast({
         title: 'Erreur',
-        description: error.message || 'Une erreur est survenue lors de la mise à jour de l\'objectif.',
+        description: error instanceof Error ? error.message : 'Une erreur est survenue lors de la mise à jour de l\'objectif.',
         variant: 'destructive',
       });
     }
