@@ -7,22 +7,30 @@ import { EditReccurrenceDialog } from '@/components/reccurrences/editReccurrence
 import { Card } from '@/components/ui/card';
 import { Wallet } from 'lucide-react';
 
+// Define the Reccurrence interface
+interface Reccurrence {
+  id: string;
+  type: 'income' | 'expense';
+  amount: number;
+  // Add other properties as needed
+}
+
 export default function ReccurrencesPage() {
-  const [reccurrences, setReccurrences] = useState([]); // Remplacez transactions par reccurrences
+  const [reccurrences, setReccurrences] = useState<Reccurrence[]>([]);
   const [categories, setCategories] = useState([]);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [selectedReccurrence, setSelectedReccurrence] = useState(null); // Remplacez selectedTransaction par selectedReccurrence
+  const [selectedReccurrence, setSelectedReccurrence] = useState<Reccurrence | null>(null);
   const [initialBudget, setInitialBudget] = useState(0);
 
   useEffect(() => {
     const loadData = async () => {
       try {
         const [reccurrencesData, categoriesData, budgetResponse] = await Promise.all([
-          fetchRecurrences(), // Remplacez fetchTransactions par fetchRecurrences
+          fetchRecurrences(),
           fetchCategories(),
           fetchBudgets(),
         ]);
-        setReccurrences(reccurrencesData); // Remplacez transactions par reccurrences
+        setReccurrences(reccurrencesData);
         setCategories(categoriesData);
 
         if (budgetResponse && budgetResponse.initialAmount) {
@@ -38,8 +46,8 @@ export default function ReccurrencesPage() {
     loadData();
   }, []);
 
-  const handleEditClick = (reccurrence) => {
-    setSelectedReccurrence(reccurrence); // Remplacez selectedTransaction par selectedReccurrence
+  const handleEditClick = (reccurrence: Reccurrence) => {
+    setSelectedReccurrence(reccurrence);
     setIsEditDialogOpen(true);
   };
 
@@ -54,17 +62,17 @@ export default function ReccurrencesPage() {
           setInitialBudget((prevBudget) => prevBudget + reccurrenceToDelete.amount);
         }
 
-        await deleteRecurrence(reccurrenceId); // Remplacez deleteTransaction par deleteRecurrence
+        await deleteRecurrence(reccurrenceId);
         setReccurrences((prevReccurrences) =>
           prevReccurrences.filter((reccurrence) => reccurrence.id !== reccurrenceId)
-        ); // Remplacez transactions par reccurrences
+        );
       }
     } catch (error) {
       console.error('Erreur lors de la suppression de la récurrence:', error);
     }
   };
 
-  const handleReccurrenceUpdate = (updatedReccurrence) => {
+  const handleReccurrenceUpdate = (updatedReccurrence: Reccurrence) => {
     setReccurrences((prevReccurrences) => {
       const oldReccurrence = prevReccurrences.find((r) => r.id === updatedReccurrence.id);
 
@@ -84,15 +92,13 @@ export default function ReccurrencesPage() {
 
       return prevReccurrences.map((reccurrence) =>
         reccurrence.id === updatedReccurrence.id ? updatedReccurrence : reccurrence
-      ); // Remplacez transactions par reccurrences
+      );
     });
   };
 
-  const handleReccurrenceCreated = (newReccurrence) => {
-    // Ajouter la nouvelle récurrence à la liste
-    setReccurrences((prevReccurrences) => [...prevReccurrences, newReccurrence]); // Remplacez transactions par reccurrences
+  const handleReccurrenceCreated = (newReccurrence: Reccurrence) => {
+    setReccurrences((prevReccurrences) => [...prevReccurrences, newReccurrence]);
 
-    // Mettre à jour le solde en fonction du type de récurrence
     if (newReccurrence.type === 'income') {
       setInitialBudget((prevBudget) => prevBudget + newReccurrence.amount);
     } else {
@@ -102,23 +108,21 @@ export default function ReccurrencesPage() {
 
   return (
     <div className="space-y-8">
-      {/* Liste des récurrences */}
       <ReccurrenceList
-        reccurrences={reccurrences} // Remplacez transactions par reccurrences
+        reccurrences={reccurrences}
         categories={categories}
-        onDeleteReccurrence={handleDeleteReccurrence} // Remplacez onDeleteTransaction par onDeleteReccurrence
-        onEditReccurrence={handleEditClick} // Remplacez onEditTransaction par onEditReccurrence
-        onReccurrenceCreated={handleReccurrenceCreated} // Remplacez onTransactionCreated par onReccurrenceCreated
+        onDeleteReccurrence={handleDeleteReccurrence}
+        onEditReccurrence={handleEditClick}
+        onReccurrenceCreated={handleReccurrenceCreated}
         initialBudget={initialBudget}
       />
 
-      {/* Dialogue pour éditer une récurrence */}
       {selectedReccurrence && (
         <EditReccurrenceDialog
           open={isEditDialogOpen}
           onOpenChange={setIsEditDialogOpen}
-          reccurrence={selectedReccurrence} // Remplacez transaction par reccurrence
-          onReccurrenceUpdated={handleReccurrenceUpdate} // Remplacez onTransactionUpdated par onReccurrenceUpdated
+          reccurrence={selectedReccurrence}
+          onReccurrenceUpdated={handleReccurrenceUpdate}
         />
       )}
     </div>
