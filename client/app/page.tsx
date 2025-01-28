@@ -62,7 +62,7 @@ export default function Home() {
               comprehensive personal finance management platform.
             </p>
             <div className="flex justify-center gap-4">
-              <Link href="/register">
+              <Link href="/signup">
                 <Button size="lg" className="gap-2">
                   Start for Free
                   <ArrowRight className="h-4 w-4" />
