@@ -19,50 +19,47 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { createCategory } from '@/services/api'; // Import de la fonction API
+import { createCategory } from '@/services/api'; // Import the API function for creating a category
 
+// Define the schema for the category form
 const categorySchema = z.object({
-  name: z.string().min(1, 'Le nom est requis'),
+  name: z.string().min(1, 'Le nom est requis'), // Name is required
 });
 
 interface CategoryDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onCategoryCreated?: (newCategory: any) => void; // Fonction de rappel avec la nouvelle catégorie
+  onCategoryCreated?: (newCategory: any) => void; // Callback function with the new category
 }
 
 export function CategoryDialog({ open, onOpenChange, onCategoryCreated }: CategoryDialogProps) {
   const form = useForm<z.infer<typeof categorySchema>>({
     resolver: zodResolver(categorySchema),
     defaultValues: {
-      name: '',
+      name: '', // Default value for the name field
     },
   });
 
-  async function onSubmit(data: z.infer<typeof transactionSchema>) {
+  // Handle form submission
+  async function onSubmit(data: z.infer<typeof categorySchema>) {
     try {
-      // Convertir le montant en nombre
-      const amount = parseFloat(data.montant);
-  
-      // Formater la date au format ISO 8601
-      const formattedDate = data.date.toISOString();
-  
-      // Appel API pour créer une nouvelle transaction
-      const newTransaction = await createTransaction({
-        name: data.description, // Utilisez 'description' comme 'name'
-        amount: amount,
-        date: formattedDate, // Date au format ISO 8601
-        type: data.type,
-        categoryId: data.categoryId, // Utilisez 'categoryId'
+      // Call the API to create a new category
+      const newCategory = await createCategory({
+        name: data.name, // Use the name from the form data
       });
-  
-      console.log('Transaction créée avec succès:', newTransaction);
-  
-      // Fermer le dialogue et réinitialiser le formulaire
+
+      console.log('Catégorie créée avec succès:', newCategory);
+
+      // Call the callback function if provided
+      if (onCategoryCreated) {
+        onCategoryCreated(newCategory);
+      }
+
+      // Close the dialog and reset the form
       onOpenChange(false);
       form.reset();
     } catch (error) {
-      console.error('Erreur lors de la création de la transaction:', error);
+      console.error('Erreur lors de la création de la catégorie:', error);
     }
   }
 
