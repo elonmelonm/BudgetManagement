@@ -6,8 +6,17 @@ import { Card } from '@/components/ui/card';
 import { Wallet, TrendingUp, TrendingDown, BarChart2 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
+// Define the Transaction type
+interface Transaction {
+  id: string;
+  type: 'income' | 'expense';
+  amount: number;
+  category: string;
+  date: string;
+}
+
 export default function StatisticsPage() {
-  const [transactions, setTransactions] = useState([]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [categories, setCategories] = useState([]);
   const [initialBudget, setInitialBudget] = useState(0);
 
