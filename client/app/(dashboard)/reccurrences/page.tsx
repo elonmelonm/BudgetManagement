@@ -17,7 +17,7 @@ interface Reccurrence {
 
 export default function ReccurrencesPage() {
   const [reccurrences, setReccurrences] = useState<Reccurrence[]>([]);
-  const [categories, setCategories] = useState<any[]>([]); // Use `any[]` or define a proper type for categories
+  const [categories, setCategories] = useState<any[]>([]);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedReccurrence, setSelectedReccurrence] = useState<Reccurrence | null>(null);
   const [initialBudget, setInitialBudget] = useState(0);
@@ -110,7 +110,7 @@ export default function ReccurrencesPage() {
     <div className="space-y-8">
       {/* ReccurrenceList component */}
       <ReccurrenceList
-        reccurrences={reccurrences} // Ensure this prop is defined in ReccurrenceListProps
+        reccurrences={reccurrences}
         categories={categories}
         onDeleteReccurrence={handleDeleteReccurrence}
         onEditReccurrence={handleEditClick}

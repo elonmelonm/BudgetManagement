@@ -28,6 +28,7 @@ interface ReccurrenceListProps {
   onEditReccurrence: (reccurrence: any) => void;
   onReccurrenceCreated: (newReccurrence: any) => void;
   initialBudget: number;
+  reccurrences: any[]; // Add this line
 }
 
 export function ReccurrenceList({ 
@@ -36,43 +37,41 @@ export function ReccurrenceList({
   onEditReccurrence, 
   onReccurrenceCreated, 
   initialBudget,
+  reccurrences, // Add this line
 }: ReccurrenceListProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [reccurrences, setReccurrences] = useState<any[]>([]);
   const [selectedReccurrence, setSelectedReccurrence] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const getRecurrences = async () => {
-      try {
-        setLoading(true);
-        const data = await fetchRecurrences();
-        setReccurrences(data);
-        setError(null);
-      } catch (err) {
-        console.error('Erreur lors de la récupération des récurrences:', err);
-        setError('Erreur lors de la récupération des récurrences');
-      } finally {
-        setLoading(false);
-      }
-    };
+  // Remove the useEffect that fetches reccurrences since it will be handled by the parent component
+  // useEffect(() => {
+  //   const getRecurrences = async () => {
+  //     try {
+  //       setLoading(true);
+  //       const data = await fetchRecurrences();
+  //       setReccurrences(data);
+  //       setError(null);
+  //     } catch (err) {
+  //       console.error('Erreur lors de la récupération des récurrences:', err);
+  //       setError('Erreur lors de la récupération des récurrences');
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
 
-    getRecurrences();
-  }, []);
+  //   getRecurrences();
+  // }, []);
 
   const handleReccurrenceCreated = (newReccurrence: any) => {
-    setReccurrences((prevReccurrences) => [...prevReccurrences, newReccurrence]);
     onReccurrenceCreated(newReccurrence);
   };
 
   const handleDeleteReccurrence = async (reccurrenceId: string) => {
     try {
       await deleteRecurrence(reccurrenceId);
-      setReccurrences((prevReccurrences) =>
-        prevReccurrences.filter((reccurrence) => reccurrence.id !== reccurrenceId)
-      );
+      onDeleteReccurrence(reccurrenceId);
     } catch (error) {
       console.error('Erreur lors de la suppression de la récurrence:', error);
     }
@@ -84,11 +83,7 @@ export function ReccurrenceList({
   };
 
   const handleReccurrenceUpdated = (updatedReccurrence: any) => {
-    setReccurrences((prevReccurrences) =>
-      prevReccurrences.map((reccurrence) =>
-        reccurrence.id === updatedReccurrence.id ? updatedReccurrence : reccurrence
-      )
-    );
+    onEditReccurrence(updatedReccurrence);
   };
 
   return (
