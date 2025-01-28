@@ -87,15 +87,15 @@ export function ReccurrenceDialog({ open, onOpenChange, onReccurrenceCreated }: 
       if (!data.categoryId) {
         throw new Error('Veuillez sélectionner une catégorie.');
       }
-
+  
       const amount = parseFloat(data.amount);
       if (isNaN(amount) || amount <= 0) {
         throw new Error('Le montant doit être un nombre positif.');
       }
-
+  
       const startDate = data.startDate.toISOString().split('T')[0];
       const endDate = data.endDate.toISOString().split('T')[0];
-
+  
       const newRecurrence = await createRecurrence({
         name: data.name,
         frequency: data.frequency,
@@ -105,18 +105,21 @@ export function ReccurrenceDialog({ open, onOpenChange, onReccurrenceCreated }: 
         type: data.type,
         categoryId: data.categoryId,
       });
-
+  
       if (onReccurrenceCreated) {
-        onReccurrenceCreated(newRecurrence); // Utiliser la bonne prop
+        onReccurrenceCreated(newRecurrence);
       }
-
+  
       onOpenChange(false);
       form.reset();
     } catch (error) {
-      console.error('Erreur lors de la création de la récurrence:', error);
+      let errorMessage = 'Une erreur est survenue lors de la création de la récurrence.';
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
       toast({
         title: 'Erreur',
-        description: error.message || 'Une erreur est survenue lors de la création de la récurrence.',
+        description: errorMessage,
         variant: 'destructive',
       });
     }
