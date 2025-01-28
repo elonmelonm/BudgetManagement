@@ -7,11 +7,19 @@ import { EditTransactionDialog } from '@/components/transactions/editTransaction
 import { Card } from '@/components/ui/card';
 import { Wallet } from 'lucide-react';
 
+// Define a type for the transaction object
+type Transaction = {
+  id: string;
+  type: 'income' | 'expense';
+  amount: number;
+  // Add other properties as needed
+};
+
 export default function TransactionsPage() {
-  const [transactions, setTransactions] = useState([]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [categories, setCategories] = useState([]);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [selectedTransaction, setSelectedTransaction] = useState(null);
+  const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
   const [initialBudget, setInitialBudget] = useState(0);
 
   useEffect(() => {
@@ -38,7 +46,7 @@ export default function TransactionsPage() {
     loadData();
   }, []);
 
-  const handleEditClick = (transaction) => {
+  const handleEditClick = (transaction: Transaction) => {
     setSelectedTransaction(transaction);
     setIsEditDialogOpen(true);
   };
@@ -64,7 +72,7 @@ export default function TransactionsPage() {
     }
   };
 
-  const handleTransactionUpdate = (updatedTransaction) => {
+  const handleTransactionUpdate = (updatedTransaction: Transaction) => {
     setTransactions((prevTransactions) => {
       const oldTransaction = prevTransactions.find((t) => t.id === updatedTransaction.id);
 
@@ -88,7 +96,7 @@ export default function TransactionsPage() {
     });
   };
 
-  const handleTransactionCreated = (newTransaction) => {
+  const handleTransactionCreated = (newTransaction: Transaction) => {
     // Ajouter la nouvelle transaction à la liste
     setTransactions((prevTransactions) => [...prevTransactions, newTransaction]);
 
