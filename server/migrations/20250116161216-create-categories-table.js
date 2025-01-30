@@ -5,7 +5,7 @@ module.exports = {
     await queryInterface.createTable('Categories', {
       id: {
         type: Sequelize.UUID,
-        defaultValue: Sequelize.DataTypes.UUIDV4,
+        defaultValue: Sequelize.UUIDV4,
         primaryKey: true,
         allowNull: false,
       },
@@ -44,16 +44,16 @@ module.exports = {
         allowNull: false,
       },
     });
+    const { v4: uuidv4 } = require('uuid'); // Importer la librairie UUID
 
-    // Insérer les catégories prédéfinies
     await queryInterface.bulkInsert('Categories', [
-      { id: Sequelize.UUIDV4(), name: 'Alimentation', isPredefined: true, createdAt: new Date(), updatedAt: new Date() },
-      { id: Sequelize.UUIDV4(), name: 'Transport', isPredefined: true, createdAt: new Date(), updatedAt: new Date() },
-      { id: Sequelize.UUIDV4(), name: 'Logement', isPredefined: true, createdAt: new Date(), updatedAt: new Date() },
-      { id: Sequelize.UUIDV4(), name: 'Divertissement', isPredefined: true, createdAt: new Date(), updatedAt: new Date() },
-      { id: Sequelize.UUIDV4(), name: 'Santé', isPredefined: true, createdAt: new Date(), updatedAt: new Date() },
-      { id: Sequelize.UUIDV4(), name: 'Education', isPredefined: true, createdAt: new Date(), updatedAt: new Date() },
-      { id: Sequelize.UUIDV4(), name: 'Outils accessoires', isPredefined: true, createdAt: new Date(), updatedAt: new Date() },
+      { id: uuidv4(), name: 'Alimentation', isPredefined: true, createdAt: new Date(), updatedAt: new Date() },
+      { id: uuidv4(), name: 'Transport', isPredefined: true, createdAt: new Date(), updatedAt: new Date() },
+      { id: uuidv4(), name: 'Logement', isPredefined: true, createdAt: new Date(), updatedAt: new Date() },
+      { id: uuidv4(), name: 'Divertissement', isPredefined: true, createdAt: new Date(), updatedAt: new Date() },
+      { id: uuidv4(), name: 'Santé', isPredefined: true, createdAt: new Date(), updatedAt: new Date() },
+      { id: uuidv4(), name: 'Education', isPredefined: true, createdAt: new Date(), updatedAt: new Date() },
+      { id: uuidv4(), name: 'Outils accessoires', isPredefined: true, createdAt: new Date(), updatedAt: new Date() },
     ]);
   },
 
