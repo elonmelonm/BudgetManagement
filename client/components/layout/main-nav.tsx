@@ -13,6 +13,7 @@ import {
   User,
   LogOut,
   Menu, // Icône pour le menu
+  X, // Icône pour fermer
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -30,7 +31,7 @@ export function MainNav() {
   const pathname = usePathname();
   const router = useRouter();
   const { toast } = useToast();
-  
+
   // État pour gérer la visibilité de la sidebar
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -41,6 +42,11 @@ export function MainNav() {
       description: 'Vous avez été déconnecté avec succès.',
     });
     router.push('/login');
+    setIsSidebarOpen(false); // Ferme la sidebar après déconnexion
+  };
+
+  const closeSidebar = () => {
+    setIsSidebarOpen(false);
   };
 
   return (
@@ -54,12 +60,32 @@ export function MainNav() {
         <Menu className="h-6 w-6" />
       </button>
 
+      {/* Overlay pour fermer la sidebar en cliquant à l'extérieur */}
+      {isSidebarOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/50 md:hidden"
+          onClick={closeSidebar}
+          aria-hidden="true"
+        ></div>
+      )}
+
       {/* Sidebar */}
-      <nav className={cn(
+      <nav
+        className={cn(
           "fixed inset-y-0 left-0 z-50 flex flex-col gap-2 bg-white shadow-lg transition-transform transform md:relative md:flex md:w-64",
           isSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         )}
       >
+        {/* Bouton pour fermer la sidebar en mode mobile */}
+        <button
+          className="md:hidden self-end p-2"
+          onClick={closeSidebar}
+          aria-label="Fermer"
+        >
+          <X className="h-6 w-6" />
+        </button>
+
+        {/* Liens de navigation */}
         {navigation.map((item) => {
           const Icon = item.icon;
           const isActive = pathname === item.href;
@@ -68,6 +94,7 @@ export function MainNav() {
             <Link
               key={item.href}
               href={item.href}
+              onClick={closeSidebar} // Ferme la sidebar après navigation
               className={cn(
                 'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors',
                 isActive
@@ -81,6 +108,8 @@ export function MainNav() {
             </Link>
           );
         })}
+
+        {/* Bouton de déconnexion */}
         <button
           onClick={handleLogout}
           className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-destructive hover:bg-destructive/10 mt-auto"
