@@ -47,13 +47,13 @@ module.exports = {
 
     // Insérer les catégories prédéfinies
     await queryInterface.bulkInsert('Categories', [
-      { id: Sequelize.UUIDV4(), name: 'Alimentation', isPredefined: true, createdAt: new Date(), updatedAt: new Date() },
-      { id: Sequelize.UUIDV4(), name: 'Transport', isPredefined: true, createdAt: new Date(), updatedAt: new Date() },
-      { id: Sequelize.UUIDV4(), name: 'Logement', isPredefined: true, createdAt: new Date(), updatedAt: new Date() },
-      { id: Sequelize.UUIDV4(), name: 'Divertissement', isPredefined: true, createdAt: new Date(), updatedAt: new Date() },
-      { id: Sequelize.UUIDV4(), name: 'Santé', isPredefined: true, createdAt: new Date(), updatedAt: new Date() },
-      { id: Sequelize.UUIDV4(), name: 'Education', isPredefined: true, createdAt: new Date(), updatedAt: new Date() },
-      { id: Sequelize.UUIDV4(), name: 'Outils accessoires', isPredefined: true, createdAt: new Date(), updatedAt: new Date() },
+      { id: Sequelize.UUIDV4, name: 'Alimentation', isPredefined: true, createdAt: new Date(), updatedAt: new Date() },
+      { id: Sequelize.UUIDV4, name: 'Transport', isPredefined: true, createdAt: new Date(), updatedAt: new Date() },
+      { id: Sequelize.UUIDV4, name: 'Logement', isPredefined: true, createdAt: new Date(), updatedAt: new Date() },
+      { id: Sequelize.UUIDV4, name: 'Divertissement', isPredefined: true, createdAt: new Date(), updatedAt: new Date() },
+      { id: Sequelize.UUIDV4, name: 'Santé', isPredefined: true, createdAt: new Date(), updatedAt: new Date() },
+      { id: Sequelize.UUIDV4, name: 'Education', isPredefined: true, createdAt: new Date(), updatedAt: new Date() },
+      { id: Sequelize.UUIDV4, name: 'Outils accessoires', isPredefined: true, createdAt: new Date(), updatedAt: new Date() },
     ]);
   },
 
