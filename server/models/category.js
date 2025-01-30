@@ -21,9 +21,22 @@ module.exports = (sequelize) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
+      isPredefined: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
       budgetId: {
         type: DataTypes.UUID,
-        allowNull: false,
+        allowNull: true, // Permet aux catégories prédéfinies de ne pas être liées à un budget
+      },
+      userId: {
+        type: DataTypes.UUID,
+        allowNull: true, // Permet aux catégories prédéfinies de ne pas être liées à un utilisateur
+        references: {
+          model: 'Users',
+          key: 'id',
+        },
+        onDelete: 'CASCADE',
       },
     },
     {

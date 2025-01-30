@@ -13,21 +13,27 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
+      isPredefined: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+      },
       budgetId: {
         type: Sequelize.UUID,
+        allowNull: true, // Permettre NULL pour les catégories prédéfinies
         references: {
-          model: 'Budgets', // Table associée
+          model: 'Budgets',
           key: 'id',
         },
-        allowNull: false,
+        onDelete: 'CASCADE',
       },
       userId: {
         type: Sequelize.UUID,
+        allowNull: true, // Permettre NULL pour les catégories prédéfinies
         references: {
-          model: 'Users', // Vérifiez que votre modèle User est bien défini
+          model: 'Users',
           key: 'id',
         },
-        allowNull: false, // ou true en fonction de votre logique
+        onDelete: 'CASCADE',
       },
       createdAt: {
         type: Sequelize.DATE,
@@ -38,6 +44,17 @@ module.exports = {
         allowNull: false,
       },
     });
+
+    // Insérer les catégories prédéfinies
+    await queryInterface.bulkInsert('Categories', [
+      { id: Sequelize.UUIDV4(), name: 'Alimentation', isPredefined: true, createdAt: new Date(), updatedAt: new Date() },
+      { id: Sequelize.UUIDV4(), name: 'Transport', isPredefined: true, createdAt: new Date(), updatedAt: new Date() },
+      { id: Sequelize.UUIDV4(), name: 'Logement', isPredefined: true, createdAt: new Date(), updatedAt: new Date() },
+      { id: Sequelize.UUIDV4(), name: 'Divertissement', isPredefined: true, createdAt: new Date(), updatedAt: new Date() },
+      { id: Sequelize.UUIDV4(), name: 'Santé', isPredefined: true, createdAt: new Date(), updatedAt: new Date() },
+      { id: Sequelize.UUIDV4(), name: 'Education', isPredefined: true, createdAt: new Date(), updatedAt: new Date() },
+      { id: Sequelize.UUIDV4(), name: 'Outils accessoires', isPredefined: true, createdAt: new Date(), updatedAt: new Date() },
+    ]);
   },
 
   down: async (queryInterface, Sequelize) => {
