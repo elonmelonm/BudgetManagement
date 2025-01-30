@@ -93,9 +93,9 @@ export function TransactionList({
                     )}
                   >
                     {transaction.type === 'income' ? (
-                      <ArrowUpCircle className="h-4 w-4" />
-                    ) : (
                       <ArrowDownCircle className="h-4 w-4" />
+                    ) : (
+                      <ArrowUpCircle className="h-4 w-4" />
                     )}
                   </div>
                   {transaction.name}

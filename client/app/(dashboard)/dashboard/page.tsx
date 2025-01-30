@@ -146,7 +146,7 @@ export default function DashboardPage() {
         <Card className="p-6">
           <div className="flex items-center gap-4">
             <div className="rounded-full bg-green-500/10 p-3">
-              <ArrowUpCircle className="h-6 w-6 text-green-500" />
+              <ArrowDownCircle className="h-6 w-6 text-green-500" />
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Total des Revenus</p>
@@ -163,7 +163,7 @@ export default function DashboardPage() {
         <Card className="p-6">
           <div className="flex items-center gap-4">
             <div className="rounded-full bg-red-500/10 p-3">
-              <ArrowDownCircle className="h-6 w-6 text-red-500" />
+              <ArrowUpCircle className="h-6 w-6 text-red-500" />
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Total des Dépenses</p>
@@ -209,9 +209,9 @@ export default function DashboardPage() {
                     )}
                   >
                     {transaction.type === 'income' ? (
-                      <ArrowUpCircle className="h-4 w-4" />
-                    ) : (
                       <ArrowDownCircle className="h-4 w-4" />
+                    ) : (
+                      <ArrowUpCircle className="h-4 w-4" />
                     )}
                   </div>
                   <div>
