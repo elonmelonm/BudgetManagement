@@ -82,7 +82,7 @@ export default function StatisticsPage() {
 
         <Card className="p-6">
           <div className="flex items-center gap-4">
-            <TrendingUp className="h-8 w-8 text-green-500" />
+            <TrendingDown className="h-8 w-8 text-green-500" />
             <div>
               <p className="text-sm text-muted-foreground">Revenus totaux</p>
               <p className="text-2xl font-bold">
@@ -97,7 +97,7 @@ export default function StatisticsPage() {
 
         <Card className="p-6">
           <div className="flex items-center gap-4">
-            <TrendingDown className="h-8 w-8 text-red-500" />
+            <TrendingUp className="h-8 w-8 text-red-500" />
             <div>
               <p className="text-sm text-muted-foreground">Dépenses totales</p>
               <p className="text-2xl font-bold">

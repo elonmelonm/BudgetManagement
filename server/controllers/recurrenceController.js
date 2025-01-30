@@ -1,3 +1,4 @@
+const { where } = require('sequelize');
 const { Recurrence, Budget } = require('../models');
 
 module.exports = {
@@ -57,8 +58,9 @@ module.exports = {
 
     // Récupérer toutes les récurrences
     getAllRecurrences: async (req, res) => {
+        const userId = req.user.id;
       try {
-        const recurrences = await Recurrence.findAll();
+        const recurrences = await Recurrence.findAll( { where: { userId }});
         res.status(200).json(recurrences);
       } catch (error) {
         console.error('Erreur lors de la récupération de toutes les récurrences:', error);
