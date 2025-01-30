@@ -16,7 +16,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Liste des origines autorisées
-const allowedOrigins = ['https://budget-management-liard.vercel.app'];
+const allowedOrigins = ['https://budget-management-liard.vercel.app', 'http://localhost:3000'];
 
 
 // Configuration CORS avec une fonction pour gérer plusieurs origines
