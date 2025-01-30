@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
@@ -11,6 +12,7 @@ import {
   Tags,
   User,
   LogOut,
+  Menu, // Icône pour le menu
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -28,52 +30,66 @@ export function MainNav() {
   const pathname = usePathname();
   const router = useRouter();
   const { toast } = useToast();
+  
+  // État pour gérer la visibilité de la sidebar
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const handleLogout = () => {
-    // Supprime le token pour invalider la session
     localStorage.removeItem('token');
-
-    // Affiche une notification de succès
     toast({
       title: 'Déconnexion réussie',
       description: 'Vous avez été déconnecté avec succès.',
     });
-
-    // Redirige l'utilisateur vers la page de connexion
     router.push('/login');
   };
 
   return (
-    <nav className="flex flex-col gap-2">
-      {navigation.map((item) => {
-        const Icon = item.icon;
-        const isActive = pathname === item.href;
-
-        return (
-          <Link
-            key={item.href}
-            href={item.href}
-            className={cn(
-              'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors',
-              isActive
-                ? 'bg-primary text-primary-foreground'
-                : 'hover:bg-muted text-muted-foreground hover:text-foreground'
-            )}
-            aria-current={isActive ? 'page' : undefined}
-          >
-            <Icon className="h-4 w-4" aria-hidden="true" />
-            <span>{item.name}</span>
-          </Link>
-        );
-      })}
-      <button
-        onClick={handleLogout}
-        className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-destructive hover:bg-destructive/10 mt-auto"
-        aria-label="Déconnexion"
+    <>
+      {/* Bouton pour ouvrir/fermer la sidebar sur mobile */}
+      <button 
+        className="md:hidden p-2"
+        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+        aria-label="Menu"
       >
-        <LogOut className="h-4 w-4" aria-hidden="true" />
-        <span>Déconnexion</span>
+        <Menu className="h-6 w-6" />
       </button>
-    </nav>
+
+      {/* Sidebar */}
+      <nav className={cn(
+          "fixed inset-y-0 left-0 z-50 flex flex-col gap-2 bg-white shadow-lg transition-transform transform md:relative md:flex md:w-64",
+          isSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+        )}
+      >
+        {navigation.map((item) => {
+          const Icon = item.icon;
+          const isActive = pathname === item.href;
+
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={cn(
+                'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors',
+                isActive
+                  ? 'bg-primary text-primary-foreground'
+                  : 'hover:bg-muted text-muted-foreground hover:text-foreground'
+              )}
+              aria-current={isActive ? 'page' : undefined}
+            >
+              <Icon className="h-4 w-4" aria-hidden="true" />
+              <span>{item.name}</span>
+            </Link>
+          );
+        })}
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-destructive hover:bg-destructive/10 mt-auto"
+          aria-label="Déconnexion"
+        >
+          <LogOut className="h-4 w-4" aria-hidden="true" />
+          <span>Déconnexion</span>
+        </button>
+      </nav>
+    </>
   );
 }
