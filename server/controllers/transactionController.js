@@ -151,8 +151,9 @@ module.exports = {
 
     // Récupérer toutes les transactions
     getAllTransactions: async (req, res) => {
-      try {
-        const transactions = await Transaction.findAll({
+        const userId = req.user.id;
+        try {
+        const transactions = await Transaction.findAll({ where: { userId },
           include: [{ model: Category, as: 'category', attributes: ['name'] }],
         });
         res.status(200).json(transactions);
