@@ -72,7 +72,7 @@ export function MainNav() {
       {/* Sidebar */}
       <nav
         className={cn(
-          "fixed inset-y-0 left-0 z-50 flex flex-col gap-2 bg-white shadow-lg transition-transform transform md:relative md:flex md:w-64",
+          "fixed inset-y-0 left-0 z-50 flex flex-col gap-2 bg-black shadow-lg transition-transform transform md:relative md:flex md:w-60",
           isSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         )}
       >
