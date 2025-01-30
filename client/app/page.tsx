@@ -1,7 +1,7 @@
 'use client'; 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Wallet, PieChart, Target, ArrowRight } from 'lucide-react';
+import { Wallet, PieChart, Target, ArrowRight, LogIn, Rocket } from 'lucide-react';
 import { useEffect } from 'react';
 
 export default function Home() {
@@ -36,18 +36,34 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted">
       <div className="container mx-auto px-4 py-16">
+      
         <nav className="flex justify-between items-center mb-16">
           <div className="flex items-center space-x-2">
             <Wallet className="h-6 w-6" />
             <span className="text-xl font-bold">Budget Master</span>
           </div>
-          <div className="space-x-4">
+          <div className="flex items-center justify-between space-x-4">
+            {/* Texte affiché sur les écrans moyens et plus grands */}
+            {/* <span >Sign In</span> */}
             <Link href="/login">
-              <Button variant="ghost">Sign In</Button>
+              <Button className="hidden md:inline" variant="ghost">Sign In</Button>
             </Link>
             <Link href="/signup">
-              <Button>Get Started</Button>
+              <Button className="hidden md:inline" >Get Started</Button>
             </Link>
+
+            {/* Icônes affichées en mode mobile */}
+            <div className="flex md:hidden">
+              {/* Lien pour "Sign In" */}
+              <Link href="/login" aria-label="Sign In" className="p-2 ml-2">
+                <LogIn className="h-6 w-6" /> {/* Icône LogIn */}
+              </Link>
+
+              {/* Lien pour "Get Started" */}
+              <Link href="/signup" aria-label="Get Started" className="p-2">
+                <Rocket className="h-6 w-6" /> {/* Icône Rocket */}
+              </Link>
+            </div>
           </div>
         </nav>
 

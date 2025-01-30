@@ -104,9 +104,11 @@ export function ReccurrenceList({
             </p>
           </div>
         </div>
-        <Button className='my-auto' onClick={() => setIsDialogOpen(true)}>
-          <Plus className="h-4 w-4 mr-2" />
-          Nouvelle Récurrence
+        {/* Bouton avec l'icône Plus */}
+        <Button onClick={() => setIsDialogOpen(true)} className="flex items-center rounded-full my-auto">
+          <Plus className="h-4 w-4" />
+          {/* Texte affiché uniquement en mode tablette et PC */}
+          <span className="hidden md:inline">Nouvelle recurrence</span>
         </Button>
       </div>
 

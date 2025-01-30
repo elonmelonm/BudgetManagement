@@ -67,12 +67,17 @@ export default function CategoriesPage() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
+        {/* Titre affiché uniquement en mode tablette et PC */}
         <h1 className="text-2xl font-semibold">Catégories</h1>
-        <Button onClick={() => setIsDialogOpen(true)}>
-          <Plus className="h-4 w-4 mr-2" />
-          Nouvelle catégorie
+        
+        {/* Bouton avec l'icône Plus */}
+        <Button onClick={() => setIsDialogOpen(true)} className="flex items-center rounded-full">
+          <Plus className="h-4 w-4" />
+          {/* Texte affiché uniquement en mode tablette et PC */}
+          <span className="hidden md:inline">Nouvelle catégorie</span>
         </Button>
       </div>
+
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {categories.map((category) => (

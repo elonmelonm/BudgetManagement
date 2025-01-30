@@ -72,7 +72,7 @@ export function MainNav() {
       {/* Sidebar */}
       <nav
         className={cn(
-          "fixed inset-y-0 left-0 z-50 flex flex-col gap-2 bg-dark shadow-lg transition-transform transform md:relative md:flex md:w-56",
+          "fixed inset-y-0 -left-1 md:-left-0 z-50 flex flex-col gap-2 bg-inherit shadow-lg transition-transform transform md:relative md:flex lg:w-64 md:w-40 ",
           isSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         )}
       >
@@ -82,7 +82,7 @@ export function MainNav() {
           onClick={closeSidebar}
           aria-label="Fermer"
         >
-          <X className="h-6 w-6" />
+          <X className="h-6 w-6 text-red-800" />
         </button>
 
         {/* Liens de navigation */}
